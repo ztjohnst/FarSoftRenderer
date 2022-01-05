@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+
+# tga stuff
+*tga*
+./data
+
+# binary
+farsoft_renderer
