@@ -1,4 +1,8 @@
+#ifdef __APPLE__
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 #include <string>
 #include <stdio.h>
 #include <algorithm>
@@ -100,6 +104,9 @@ int main(int argc, char** args)
   SDL_Surface* window_surface = SDL_GetWindowSurface(window);
 
   Model m("data/african_head.obj");
+  //Model m("data/kitten.obj");
+
+  printf("# vertices in model: %lu\n", m.vertices.size());
 
   // Drawing.... TODO: move inside of loop
   //drawLine(50, 300, 50, 60, GREEN, window_surface);

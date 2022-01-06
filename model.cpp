@@ -41,6 +41,7 @@ Model::Model(const char* filepath)
       printf("Indices:\n");
       int j = 0;
       while(iss >> i >> trash >> itrash >> trash >> itrash)
+      //while(iss >> i >> trash >> trash >> itrash)
       {
         i--; // Waveform obj files start at 1
         printf("I: %d\n", i);
