@@ -18,12 +18,11 @@
 void setPixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
   Uint32 * const target_pixel = (Uint32 *) ((Uint8 *) surface->pixels
-                                             + y * surface->pitch
+                                             + (y) * surface->pitch
                                              + x * surface->format->BytesPerPixel);
   *target_pixel = pixel;
 }
 
-// TODO: Line drawing is off
 void drawLine(int x0, int x1, int y0, int y1, Uint32 color, SDL_Surface* surface)
 {
   // Calculate bound
@@ -73,6 +72,32 @@ void drawLine(int x0, int x1, int y0, int y1, Uint32 color, SDL_Surface* surface
   }
 }
 
+void drawTriangle(Vector2Di v0, Vector2Di v1, Vector2Di v2, Uint32 color, SDL_Surface* surface)
+{
+  drawLine(v0.x, v1.x, v0.y, v1.y, color, surface);  
+  drawLine(v1.x, v2.x, v1.y, v2.y, color, surface);  
+  drawLine(v2.x, v0.x, v2.y, v0.y, color, surface);  
+}
+
+void drawModelWireFrame(Model* m, int width, int height, Uint32 color, SDL_Surface* surface)
+{
+  for(unsigned long int i = 0 ; i < m->indices.size() ; i++)
+  {
+    Index ind = m->indices[i]; 
+    for(int j = 0 ; j < 3 ; j++)
+    {
+      Vector3Df v0 = m->vertices[ind[j]];
+      Vector3Df v1 = m->vertices[ind[(j+1)%3]];
+      int x0 = (v0.x+1)*width / 2.;
+      int x1 = (v1.x+1)*width / 2.;
+      int y0 = (v0.y+1)*height / 2.;
+      int y1 = (v1.y+1)*height / 2.;
+      drawLine(x0,x1,y0,y1,color,surface);
+    }
+  }
+}
+
+
 int main(int argc, char** args) 
 {
 
@@ -111,21 +136,14 @@ int main(int argc, char** args)
   // Drawing.... TODO: move inside of loop
   //drawLine(50, 300, 50, 60, GREEN, window_surface);
   //drawLine(300, 50, 300, 50, RED, window_surface);
+  
+  drawModelWireFrame(&m, width, height, GREEN, window_surface);
 
-  for(int i = 0 ; i < m.indices.size() ; i++)
-  {
-    Index ind = m.indices[i]; 
-    for(int j = 0 ; j < 3 ; j++)
-    {
-      Vector3D v0 = m.vertices[ind[j]];
-      Vector3D v1 = m.vertices[ind[(j+1)%3]];
-      int x0 = (v0.x+1)*width / 2.;
-      int x1 = (v1.x+1)*width / 2.;
-      int y0 = (v0.y+1)*height / 2.;
-      int y1 = (v1.y+1)*height / 2.;
-      drawLine(x0,x1,y0,y1,GREEN,window_surface);
-    }
-  }
+  Vector2Di t0[3] = { Vector2Di(10, 70),   Vector2Di(50, 160),  Vector2Di(70, 80) };
+  //Vector2D t1[3] = { Vector2D(180, 50),   Vector2D(150, 1),  Vector2D(70, 180) };
+  //Vector2D t2[3] = { Vector2D(180, 150),   Vector2D(120, 160),  Vector2D(130, 180) };
+
+  //drawTriangle(t0[0], t0[1], t0[2], GREEN, window_surface);
 
   SDL_UpdateWindowSurface(window);
 

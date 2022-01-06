@@ -18,7 +18,7 @@ Model::Model(const char* filepath)
       line.replace(v_pos, vr.length(), "");
       printf("%s\n", line.c_str());
       std::istringstream iss(line);  
-      Vector3D v;
+      Vector3Df v;
       iss >> v.x;
       //v.x *= -1;
       iss >> v.y;

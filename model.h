@@ -25,7 +25,7 @@ class Model
     Model(const char* filepath);
     ~Model(){};
 
-    std::vector<Vector3D> vertices;
+    std::vector<Vector3Df> vertices;
     std::vector<Index> indices;
     
 
