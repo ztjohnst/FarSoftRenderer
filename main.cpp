@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #endif
 #include <string>
-#include <stdio.h>
+#include <stdio.h> 
 #include <algorithm>
 
 #include "model.h"
@@ -23,8 +23,11 @@ void setPixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
   *target_pixel = pixel;
 }
 
-void drawLine(int x0, int x1, int y0, int y1, Uint32 color, SDL_Surface* surface)
+std::vector<Vector2Di> drawLine(int x0, int x1, int y0, int y1, Uint32 color, SDL_Surface* surface)
 {
+
+  std::vector<Vector2Di> pixels;
+
   // Calculate bound
   int xdiff = std::abs(x0-x1);
   int ydiff = std::abs(y0-y1);
@@ -67,16 +70,32 @@ void drawLine(int x0, int x1, int y0, int y1, Uint32 color, SDL_Surface* surface
         x += (x1>x0?1:-1);
         error -= ydiff*2;
       }
+      Vector2Di p;
+      p.x = x;
+      p.y = y;
+      pixels.push_back(p);
       setPixel(surface, x, y, color);
     }
   }
+
+  return pixels;
 }
 
-void drawTriangle(Vector2Di v0, Vector2Di v1, Vector2Di v2, Uint32 color, SDL_Surface* surface)
+std::vector<Vector2Di> drawTriangle(Vector2Di v0, Vector2Di v1, Vector2Di v2, Uint32 color, SDL_Surface* surface)
 {
-  drawLine(v0.x, v1.x, v0.y, v1.y, color, surface);  
-  drawLine(v1.x, v2.x, v1.y, v2.y, color, surface);  
-  drawLine(v2.x, v0.x, v2.y, v0.y, color, surface);  
+  std::vector<Vector2Di> r;
+  std::vector<Vector2Di> pixels;
+
+  pixels = drawLine(v0.x, v1.x, v0.y, v1.y, color, surface);  
+  r.insert(r.end(), pixels.begin(), pixels.end());
+
+  pixels = drawLine(v1.x, v2.x, v1.y, v2.y, color, surface);  
+  r.insert(r.end(), pixels.begin(), pixels.end());
+
+  pixels = drawLine(v2.x, v0.x, v2.y, v0.y, color, surface);  
+  r.insert(r.end(), pixels.begin(), pixels.end());
+
+  return r;
 }
 
 void drawModelWireFrame(Model* m, int width, int height, Uint32 color, SDL_Surface* surface)
@@ -95,6 +114,16 @@ void drawModelWireFrame(Model* m, int width, int height, Uint32 color, SDL_Surfa
       drawLine(x0,x1,y0,y1,color,surface);
     }
   }
+}
+
+void fillTriangle(std::vector<Vector2Di> pixels, Uint32 color, SDL_Surface* surface)
+{
+ 
+}
+
+bool compareY(const Vector2Di &v0, const Vector2Di &v1)
+{
+  return (v0.y > v1.y);
 }
 
 
@@ -137,13 +166,19 @@ int main(int argc, char** args)
   //drawLine(50, 300, 50, 60, GREEN, window_surface);
   //drawLine(300, 50, 300, 50, RED, window_surface);
   
-  drawModelWireFrame(&m, width, height, GREEN, window_surface);
+  //drawModelWireFrame(&m, width, height, GREEN, window_surface);
 
   Vector2Di t0[3] = { Vector2Di(10, 70),   Vector2Di(50, 160),  Vector2Di(70, 80) };
   //Vector2D t1[3] = { Vector2D(180, 50),   Vector2D(150, 1),  Vector2D(70, 180) };
   //Vector2D t2[3] = { Vector2D(180, 150),   Vector2D(120, 160),  Vector2D(130, 180) };
 
-  //drawTriangle(t0[0], t0[1], t0[2], GREEN, window_surface);
+  std::vector<Vector2Di> pixels = drawTriangle(t0[0], t0[1], t0[2], GREEN, window_surface);
+  std::sort(pixels.begin(), pixels.end(), compareY);
+  for(auto it = pixels.begin() ; it != pixels.end() ; it++)
+  {
+    printf("X: %d Y: %d\n", (*it).x, (*it).y);
+  }
+  //fillTriangle(t0[0], t0[1], t0[2], GREEN, window_surface);
 
   SDL_UpdateWindowSurface(window);
 

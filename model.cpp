@@ -7,6 +7,12 @@ Model::Model(const char* filepath)
 {
   f_obj.open(filepath);
 
+  if(!f_obj)
+  {
+    printf("COULD NOT OPEN FILE!\n");
+    exit(0);
+  }
+
   std::string line;
   std::string vr = "v ";
   std::string fr = "f ";
